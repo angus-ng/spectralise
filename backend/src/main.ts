@@ -1,7 +1,10 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import express from "express"
+import * as express from "express"
+import * as dotenv from "dotenv"
 import { ExpressAdapter } from "@nestjs/platform-express"
+
+dotenv.config()
 
 async function bootstrap() {
   const expressApp = express()
@@ -10,7 +13,11 @@ async function bootstrap() {
     new ExpressAdapter(expressApp),
   )
 
-  app.enableCors()
+  app.enableCors({
+    origin: process.env.frontend,
+    methods: "GET",
+    credentials: true,
+  })
   await app.init()
 
   await app.listen(process.env.PORT ?? 3000)

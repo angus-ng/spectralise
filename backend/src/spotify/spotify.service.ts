@@ -5,64 +5,64 @@ import axios from "axios"
 export class SpotifyService {
   private clientId: string = process.env.SPOTIFY_CLIENT_ID!
   private clientSecret: string = process.env.SPOTIFY_CLIENT_SECRET!
-  private accessToken: string | null = null
-  private tokenExpiry: number | null = null
+  private redirectUri: string = process.env.SPOTIFY_REDIRECT_URI!
 
-  constructor() {}
+  getAuthorizationUrl() {
+    const scope = "user-top-read"
+    return `https://accounts.spotify.com/authorize?response_type=code&client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${encodeURIComponent(scope)}`
+  }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
-      return this.accessToken
-    }
+  async getAccessToken(code: string) {
+    const tokenUrl = "https://accounts.spotify.com/api/token"
+    const params = new URLSearchParams({
+      code,
+      redirect_uri: this.redirectUri,
+      grant_type: "authorization_code",
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
+    })
 
     try {
-      const { data } = await axios.post<{
-        access_token: string
-        expires_in: number
-      }>(
-        "https://accounts.spotify.com/api/token",
-        new URLSearchParams({ grant_type: "client_credentials" }),
+      const response = await axios.post(tokenUrl, params.toString(), {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      })
+      return response.data
+    } catch (error) {
+      console.error("Error getting access token:", error)
+      throw new Error("Failed to get access token")
+    }
+  }
+
+  async getTopTracks(accessToken: string, timeRange: string) {
+    try {
+      const response = await axios.get(
+        `https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=${timeRange}`,
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString("base64")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       )
-
-      if (!data.access_token) {
-        throw new Error("Spotify API did not return an access token")
-      }
-
-      this.accessToken = data.access_token
-      this.tokenExpiry = Date.now() + data.expires_in * 1000
-
-      return this.accessToken
+      return response.data.items
     } catch (error) {
-      console.error("Failed to get Spotify access token:", error)
-      throw new Error("Unable to authenticate with Spotify")
+      console.error("Error fetching top tracks:", error)
+      throw new Error("Failed to fetch top tracks")
     }
   }
-
-  async getTrackMetadata(trackId: string) {
-    const accessToken = await this.getAccessToken()
-    const { data } = await axios.get(
-      `https://api.spotify.com/v1/tracks/${trackId}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    )
-    return data
-  }
-
-  async getTrackAudioFeatures(trackId: string) {
-    const accessToken = await this.getAccessToken()
-    const { data } = await axios.get(
-      `https://api.spotify.com/v1/audio-features/${trackId}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    )
-    return data
+  async getArtists(artistIdList: string, accessToken: string) {
+    try {
+      const response = await axios.get(
+        `https://api.spotify.com/v1/artists/${artistIdList}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      )
+      return response.data.genres
+    } catch (error) {
+      console.error("Error fetching artist info:", error)
+      throw new Error("Failed to fetch artist info")
+    }
   }
 }
