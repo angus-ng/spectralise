@@ -8,7 +8,7 @@ export class SpotifyService {
   private redirectUri: string = process.env.SPOTIFY_REDIRECT_URI!
 
   getAuthorizationUrl() {
-    const scope = "user-top-read"
+    const scope = "user-top-read, user-read-private, user-read-email"
     return `https://accounts.spotify.com/authorize?response_type=code&client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${encodeURIComponent(scope)}`
   }
 
@@ -64,6 +64,23 @@ export class SpotifyService {
     } catch (error) {
       console.error("Error fetching artist info:", error)
       throw new Error("Failed to fetch artist info")
+    }
+  }
+  async verifyAccessToken(accessToken: string): Promise<boolean> {
+    try {
+      const response = await axios.get("https://api.spotify.com/v1/me", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      return response.status === 200
+    } catch (error) {
+      console.error(
+        "Error verifying access token:",
+        error.response?.data || error,
+      )
+      return false
     }
   }
 }
