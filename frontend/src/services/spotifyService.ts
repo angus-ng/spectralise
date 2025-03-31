@@ -41,3 +41,16 @@ export async function fetchArtists(token: string, artistIdList: string) {
 export function redirectToSpotifyLogin() {
   window.location.href = "/";
 }
+
+export async function refreshAccessToken() {
+  try {
+    const response = await axios.get("/api/refresh-token", {
+      withCredentials: true,
+    });
+    return response.data.access_token;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    window.location.href = "/";
+    return null;
+  }
+}

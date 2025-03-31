@@ -45,4 +45,28 @@ export class ApiController {
 
     return res.status(200).json({ accessToken })
   }
+  @Get("refresh-token")
+  async refreshToken(@Headers("cookie") cookies: string, @Res() res: Response) {
+    const cookiesObject = cookie.parse(cookies)
+    const refreshToken = cookiesObject.refresh_token
+
+    if (!refreshToken) {
+      return res.status(401).send("No refresh token found.")
+    }
+
+    try {
+      const newTokens =
+        await this.spotifyService.refreshAccessToken(refreshToken)
+
+      res.cookie("access_token", newTokens.access_token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      })
+
+      return res.json(newTokens)
+    } catch (error) {
+      return res.status(500).send("Failed to refresh token")
+    }
+  }
 }

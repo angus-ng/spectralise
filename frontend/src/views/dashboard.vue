@@ -4,6 +4,7 @@ import {
   fetchTopTracks,
   fetchArtists,
   redirectToSpotifyLogin,
+  refreshAccessToken,
 } from "../services/spotifyService";
 import axios from "axios";
 
@@ -31,6 +32,20 @@ async function fetchUserProfile() {
   } catch (error) {
     console.error("Error fetching user profile:", error);
   }
+}
+
+async function setupAccessToken() {
+  accessToken.value = await getAccessToken();
+
+  if (!accessToken.value) {
+    console.warn("Access token missing, trying to refresh...");
+    accessToken.value = await refreshAccessToken();
+  }
+
+  setInterval(async () => {
+    console.log("Refreshing access token...");
+    accessToken.value = await refreshAccessToken();
+  }, 55 * 60 * 1000);
 }
 
 async function getAccessToken() {
@@ -95,9 +110,7 @@ async function logOut() {
     console.error("Error logging out:", error);
   }
 }
-onMounted(async () => {
-  await getAccessToken();
-});
+onMounted(setupAccessToken);
 function generateColor(id) {
   const hash = id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return `#${((hash * 1234567) % 0xffffff).toString(16).padStart(6, "0")}`;
@@ -110,7 +123,7 @@ watch(timeRange, fetchTopTracksData);
     class="flex flex-col md:flex-row h-screen w-full overflow-auto p-6 gap-6"
   >
     <div class="w-full md:w-1/5 flex flex-col p-6 rounded-lg">
-      <p class="text-4xl flex items-center">
+      <p class="text-4xl flex items-center py-6 md:py-0">
         <img
           src="/spectralise.svg"
           alt="Spectralise Logo"
@@ -122,7 +135,7 @@ watch(timeRange, fetchTopTracksData);
       <div class="flex-grow flex flex-col items-start justify-center">
         <div
           v-if="userProfile && userProfile.image"
-          class="aspect-square max-w-[256px] w-full rounded-md overflow-hidden"
+          class="aspect-square max-w-[256px] rounded-md overflow-hidden"
         >
           <img
             :src="userProfile.image"

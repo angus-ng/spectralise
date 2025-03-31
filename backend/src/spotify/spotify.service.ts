@@ -33,6 +33,26 @@ export class SpotifyService {
       throw new Error("Failed to get access token")
     }
   }
+  async refreshAccessToken(refreshToken: string) {
+    const tokenUrl = "https://accounts.spotify.com/api/token"
+    const params = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
+    })
+
+    try {
+      const response = await axios.post(tokenUrl, params.toString(), {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      })
+
+      return response.data
+    } catch (error) {
+      console.error("Error refreshing access token:", error)
+      throw new Error("Failed to refresh access token")
+    }
+  }
 
   async getTopTracks(accessToken: string, timeRange: string) {
     try {
