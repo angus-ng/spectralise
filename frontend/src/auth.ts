@@ -1,8 +1,11 @@
-import createKindeClient from "@kinde-oss/kinde-auth-pkce-js";
+import axios from "axios";
 
-export const kinde = await createKindeClient({
-  client_id: import.meta.env.VITE_KINDE_CLIENT_ID,
-  domain: import.meta.env.VITE_KINDE_DOMAIN,
-  redirect_uri: import.meta.env.VITE_KINDE_REDIRECT_URI,
-  logout_uri: import.meta.env.VITE_KINDE_LOGOUT_URI,
-});
+export const checkAuthentication = async (): Promise<boolean> => {
+  try {
+    const response = await axios.get("/api/verify", { withCredentials: true });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Authentication check failed:", error);
+    return false;
+  }
+};
