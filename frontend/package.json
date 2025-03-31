@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@kinde-oss/kinde-auth-pkce-js": "^4.2.2",
+    "@types/spotify-api": "^0.0.25",
     "axios": "^1.8.4",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",

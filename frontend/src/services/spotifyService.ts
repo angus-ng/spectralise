@@ -2,7 +2,10 @@ import axios from "axios";
 
 const API_BASE_URL = "/spotify";
 
-export async function fetchTopTracks(token: string, timeRange: string) {
+export async function fetchTopTracks(
+  token: string | null,
+  timeRange: string | null
+) {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/top-tracks?timeRange=${timeRange}`,
