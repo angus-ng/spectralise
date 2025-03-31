@@ -26,6 +26,7 @@ export class SpotifyService {
       const response = await axios.post(tokenUrl, params.toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       })
+      // console.log("Access token response:", response.data)
       return response.data
     } catch (error) {
       console.error("Error getting access token:", error)

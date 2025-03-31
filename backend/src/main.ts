@@ -13,7 +13,7 @@ async function bootstrap() {
     new ExpressAdapter(expressApp),
   )
 
-  console.log(process.env.frontend)
+  // console.log(process.env.frontend)
   app.enableCors({
     origin: process.env.frontend,
     methods: "GET,POST",

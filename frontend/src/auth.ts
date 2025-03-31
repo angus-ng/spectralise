@@ -9,3 +9,12 @@ export const checkAuthentication = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export const logOut = async (): Promise<void> => {
+  try {
+    await axios.post("/api/logout", {}, { withCredentials: true });
+    window.location.href = "/";
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};

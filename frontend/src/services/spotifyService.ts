@@ -2,11 +2,14 @@ import axios from "axios";
 
 const API_BASE_URL = "/spotify";
 
-export async function fetchTopTracks(timeRange: string) {
+export async function fetchTopTracks(token: string, timeRange: string) {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/top-tracks?timeRange=${timeRange}`,
       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         withCredentials: true,
       }
     );
@@ -17,11 +20,14 @@ export async function fetchTopTracks(timeRange: string) {
   }
 }
 
-export async function fetchArtists(artistIdList: string) {
+export async function fetchArtists(token: string, artistIdList: string) {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/artists/${artistIdList}`,
       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         withCredentials: true,
       }
     );

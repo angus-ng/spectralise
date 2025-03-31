@@ -5,19 +5,34 @@ import {
 } from "vue-router";
 import Login from "./views/login.vue";
 import Dashboard from "./views/dashboard.vue";
-import AuthHandler from "./views/authHandler.vue";
 import { checkAuthentication } from "./auth";
 
 const routes: Array<RouteRecordRaw> = [
-  { path: "/", component: Login, name: "Login" },
-  { path: "/callback", component: AuthHandler },
   {
-    path: "/dashboard",
-    component: Dashboard,
+    path: "/",
+    component: Login,
+    name: "Login",
     beforeEnter: async (to, from, next) => {
       try {
         const isAuthenticated = await checkAuthentication();
-        console.log(isAuthenticated);
+        if (isAuthenticated) {
+          next({ name: "Dashboard" });
+        } else {
+          next();
+        }
+      } catch (error) {
+        console.error("Authentication check failed", error);
+        next();
+      }
+    },
+  },
+  {
+    path: "/dashboard",
+    component: Dashboard,
+    name: "Dashboard",
+    beforeEnter: async (to, from, next) => {
+      try {
+        const isAuthenticated = await checkAuthentication();
         if (isAuthenticated) {
           next();
         } else {

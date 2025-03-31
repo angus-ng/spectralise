@@ -7,8 +7,6 @@ const route = useRoute();
 
 onMounted(() => {
   const accessToken = route.query.access_token as string;
-  console.log(accessToken);
-
   if (accessToken) {
     localStorage.setItem("access_token", accessToken);
     router.push("/dashboard");
