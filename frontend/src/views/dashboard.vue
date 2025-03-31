@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import {
   fetchTopTracks,
   fetchArtists,
@@ -12,21 +12,35 @@ const accessToken = ref<string | null>(null);
 const timeRange = ref<string>("short_term");
 
 async function fetchTopTracksData() {
-  if (!accessToken.value) return;
+  if (!accessToken.value) {
+    console.error("No access token available");
+    return;
+  }
 
   try {
-    trackData.value = await fetchTopTracks(accessToken.value, timeRange.value);
+    console.log("Fetching top tracks...");
+    trackData.value = await fetchTopTracks(timeRange.value);
+    console.log("Top Tracks Data:", trackData.value);
+
+    if (!trackData.value || trackData.value.length === 0) {
+      console.warn("No top tracks found.");
+      return;
+    }
 
     const artistIds = trackData.value
       ?.map((track) => track.artists[0].id)
       .join(",");
+
     if (artistIds) {
-      artistsData.value = await fetchArtists(artistIds, accessToken.value);
+      console.log("Fetching artist details...");
+      artistsData.value = await fetchArtists(artistIds);
     }
   } catch (error) {
     console.error("Error fetching top tracks or artists:", error);
   }
 }
+
+watch(timeRange, fetchTopTracksData);
 </script>
 
 <template>
@@ -46,7 +60,7 @@ async function fetchTopTracksData() {
       <div v-for="(track, index) in trackData" :key="track.id" class="track">
         <h3>{{ track.name }} by {{ track.artists[0].name }}</h3>
         <p>Album: {{ track.album.name }}</p>
-        <img :src="track.album.images[0].url" alt="Album cover" width="100" />
+        <img :src="track.album.images[0]?.url" alt="Album cover" width="100" />
       </div>
     </div>
 

@@ -16,22 +16,18 @@ export class SpotifyController {
   async callback(@Query("code") code: string, @Res() res: Response) {
     try {
       const tokenData = await this.spotifyService.getAccessToken(code)
-
-      console.log("Access token:", tokenData.access_token)
       res.cookie("access_token", tokenData.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       })
       res.cookie("refresh_token", tokenData.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       })
 
-      return res.redirect(
-        `${process.env.frontend}callback?access_token=${tokenData.access_token}`,
-      )
+      return res.redirect(`${process.env.frontend}dashboard`)
     } catch (error) {
       console.error("Authentication failed:", error)
       return res.status(500).send("Authentication failed")

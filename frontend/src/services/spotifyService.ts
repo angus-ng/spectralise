@@ -2,26 +2,36 @@ import axios from "axios";
 
 const API_BASE_URL = "/spotify";
 
-export async function fetchTrack(trackId: string) {
+export async function fetchTopTracks(timeRange: string) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/track/${trackId}`);
-    console.log("Track Response:", response.data);
+    const response = await axios.get(
+      `${API_BASE_URL}/top-tracks?timeRange=${timeRange}`,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching track:", error);
+    console.error("Error fetching top tracks:", error);
     throw error;
   }
 }
 
-export async function fetchAudioFeatures(trackId: string) {
+export async function fetchArtists(artistIdList: string) {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/audio-features/${trackId}`
+      `${API_BASE_URL}/artists/${artistIdList}`,
+      {
+        withCredentials: true,
+      }
     );
-    console.log("Audio Features Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error fetching audio features:", error);
+    console.error("Error fetching artists:", error);
     throw error;
   }
+}
+
+export function redirectToSpotifyLogin() {
+  window.location.href = "/";
 }
