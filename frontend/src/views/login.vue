@@ -1,6 +1,6 @@
 <script setup lang="ts">
 function login() {
-  window.location.href = "/spotify/login";
+  window.location.href = `${import.meta.env.VITE_BACKEND}/spotify/login`;
 }
 </script>
 

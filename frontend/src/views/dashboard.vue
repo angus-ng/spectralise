@@ -49,9 +49,12 @@ async function setupAccessToken() {
 
 async function getAccessToken(): Promise<string | null> {
   try {
-    const response = await axios.get("/api/token", {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND}api/token`,
+      {
+        withCredentials: true,
+      }
+    );
     accessToken.value = response.data.accessToken;
     if (accessToken.value) {
       await fetchUserProfile();
@@ -101,7 +104,10 @@ async function fetchTopTracksData() {
 
 async function logOut() {
   try {
-    await fetch("/api/logout", { method: "POST" });
+    await fetch(`${import.meta.env.VITE_BACKEND}api/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
     accessToken.value = null;
     redirectToSpotifyLogin();
   } catch (error) {

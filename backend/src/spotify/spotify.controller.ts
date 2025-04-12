@@ -20,14 +20,16 @@ export class SpotifyController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
       })
       res.cookie("refresh_token", tokenData.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
       })
 
-      return res.redirect(`${process.env.frontend}dashboard`)
+      return res.redirect(`${process.env.frontend}/dashboard`)
     } catch (error) {
       console.error("Authentication failed:", error)
       return res.status(500).send("Authentication failed")

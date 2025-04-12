@@ -1,5 +1,12 @@
 import { bootstrap } from "../src/main"
 
-const server = await bootstrap()
+let server: any = null
 
-export default server
+export default async function handler(req: any, res: any) {
+  if (!server) {
+    const app = await bootstrap()
+    server = app
+  }
+
+  return server(req, res)
+}

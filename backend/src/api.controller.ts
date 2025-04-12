@@ -27,8 +27,18 @@ export class ApiController {
   }
   @Post("logout")
   async logout(@Res() res: Response) {
-    res.clearCookie("access_token")
-    res.clearCookie("refresh_token")
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    })
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    })
     return res.status(200).send("Logged out")
   }
   @Get("token")
@@ -60,8 +70,9 @@ export class ApiController {
 
       res.cookie("access_token", newTokens.access_token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
       })
 
       return res.json(newTokens)
