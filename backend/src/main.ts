@@ -6,21 +6,20 @@ import { ExpressAdapter } from "@nestjs/platform-express"
 
 dotenv.config()
 
-async function bootstrap() {
+export async function bootstrap() {
   const expressApp = express()
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(expressApp),
   )
 
-  // console.log(process.env.frontend)
   app.enableCors({
     origin: process.env.frontend,
     methods: "GET,POST",
     credentials: true,
   })
+
   await app.init()
 
-  await app.listen(process.env.PORT ?? 3000)
+  return expressApp
 }
-bootstrap()
