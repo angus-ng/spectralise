@@ -2,7 +2,10 @@ import axios from "axios";
 
 const API_BASE_URL = "/spotify";
 
-export async function fetchTopTracks(token: string, timeRange: string) {
+export async function fetchTopTracks(
+  token: string | null,
+  timeRange: string | null
+) {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/top-tracks?timeRange=${timeRange}`,
@@ -47,7 +50,7 @@ export async function refreshAccessToken() {
     const response = await axios.get("/api/refresh-token", {
       withCredentials: true,
     });
-    return response.data.access_token;
+    return response.data.access_token as string;
   } catch (error) {
     console.error("Error refreshing access token:", error);
     window.location.href = "/";

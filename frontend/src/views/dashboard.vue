@@ -2,17 +2,16 @@
 import { ref, watch, onMounted } from "vue";
 import {
   fetchTopTracks,
-  fetchArtists,
   redirectToSpotifyLogin,
   refreshAccessToken,
 } from "../services/spotifyService";
 import axios from "axios";
 
 const trackData = ref<SpotifyApi.TrackObjectFull[] | null>(null);
-const artistsData = ref<SpotifyApi.ArtistObjectFull[] | null>(null);
+// const artistsData = ref<SpotifyApi.ArtistObjectFull[] | null>(null);
 const accessToken = ref<string | null>(null);
-const timeRange = ref<string>(null);
-const copiedTrackId = ref(null);
+const timeRange = ref<string | null>(null);
+const copiedTrackId = ref<string | null>(null);
 const loading = ref(false);
 const userProfile = ref<{ display_name: string; image: string | null } | null>(
   null
@@ -48,26 +47,25 @@ async function setupAccessToken() {
   }, 55 * 60 * 1000);
 }
 
-async function getAccessToken() {
+async function getAccessToken(): Promise<string | null> {
   try {
     const response = await axios.get("/api/token", {
       withCredentials: true,
     });
-
     accessToken.value = response.data.accessToken;
-    // console.log("Access Token Fetched:", accessToken.value);
     if (accessToken.value) {
       await fetchUserProfile();
     }
+    return accessToken.value;
   } catch (error) {
     console.error("Error fetching access token:", error);
-    console.warn("Unauthorized, redirecting to login...");
     redirectToSpotifyLogin();
+    return null;
   }
 }
 
-function copyColor(track) {
-  const color = generateColor(track.id + track.name + track.artist / 3);
+function copyColor(track: SpotifyApi.TrackObjectFull) {
+  const color = generateColor(track.id + track.name + track.artists[0].name);
   navigator.clipboard.writeText(color).then(() => {
     copiedTrackId.value = track.id;
     setTimeout(() => (copiedTrackId.value = null), 2000);
@@ -111,7 +109,7 @@ async function logOut() {
   }
 }
 onMounted(setupAccessToken);
-function generateColor(id) {
+function generateColor(id: string) {
   const hash = id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return `#${((hash * 1234567) % 0xffffff).toString(16).padStart(6, "0")}`;
 }
@@ -194,7 +192,7 @@ watch(timeRange, fetchTopTracksData);
           >
             <div
               @click="copyColor(track)"
-              v-for="(track, index) in trackData"
+              v-for="track in trackData"
               :key="track.id"
               class="p-4 rounded-lg text-white flex flex-col items-center border border-gray-600 hover:border-white transition h-full relative"
             >
@@ -227,13 +225,15 @@ watch(timeRange, fetchTopTracksData);
                 <div
                   :style="{
                     backgroundColor: generateColor(
-                      track.id + track.name + track.artist / 3
+                      track.id + track.name + track.artists[0].name
                     ),
                   }"
                   class="w-12 h-12 rounded-full border border-gray-400 cursor-pointer"
                 ></div>
                 <p class="mt-2 text-sm text-gray-300 cursor-pointer">
-                  {{ generateColor(track.id + track.name + track.artist / 3) }}
+                  {{
+                    generateColor(track.id + track.name + track.artists[0].name)
+                  }}
                 </p>
               </div>
               <a

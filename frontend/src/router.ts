@@ -12,7 +12,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     component: Login,
     name: "Login",
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (_, __, next) => {
       try {
         const isAuthenticated = await checkAuthentication();
         if (isAuthenticated) {
@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/dashboard",
     component: Dashboard,
     name: "Dashboard",
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (_, __, next) => {
       try {
         const isAuthenticated = await checkAuthentication();
         if (isAuthenticated) {

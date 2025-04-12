@@ -6,8 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   server: {
     proxy: {
-      "/spotify": "http://localhost:3000/",
-      "/api": "http://localhost:3000/",
+      "/spotify": "https://spectralise-backend.vercel.app/",
+      "/api": "https://spectralise-backend.vercel.app/",
     },
   },
   plugins: [vue(), tailwindcss()],
