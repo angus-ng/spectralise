@@ -10,7 +10,7 @@ export async function fetchTopTracks(
     const response = await axios.get(
       `${
         import.meta.env.VITE_BACKEND
-      }${API_BASE_URL}top-tracks?timeRange=${timeRange}`,
+      }${API_BASE_URL}/top-tracks?timeRange=${timeRange}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,7 +28,7 @@ export async function fetchTopTracks(
 export async function fetchArtists(token: string, artistIdList: string) {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND}${API_BASE_URL}artists/${artistIdList}`,
+      `${import.meta.env.VITE_BACKEND}${API_BASE_URL}/artists/${artistIdList}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
